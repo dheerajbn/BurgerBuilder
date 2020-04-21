@@ -84,29 +84,45 @@ class BurgerBuilder extends Component {
         // alert('You purchased');
         // this.setState({ purchasing: false });
 
-        this.setState({ loading: true });
+        // this.setState({ loading: true });
 
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.price,
-            customer: {
-                name: 'Nkn',
-                address: {
-                    street: 'Nkn street',
-                    zipCode: '696969',
-                    country: 'Nkn Country',
-                }
-            },
-            deliveryMethod: 'fastest',
-        };
+        // const order = {
+        //     ingredients: this.state.ingredients,
+        //     price: this.state.price,
+        //     customer: {
+        //         name: 'Nkn',
+        //         address: {
+        //             street: 'Nkn street',
+        //             zipCode: '696969',
+        //             country: 'Nkn Country',
+        //         }
+        //     },
+        //     deliveryMethod: 'fastest',
+        // };
 
-        axios.post('/orders.json', order)
-            .then(res => {
-                this.setState({ loading: false, purchasing: false });
-            })
-            .catch(err => {
-                this.setState({ loading: false });
-            });
+        // axios.post('/orders.jn', order)
+        //     .then(res => {
+        //         this.setState({ loading: false, purchasing: false });
+        //     })
+        //     .catch(err => {
+        //         this.setState({ loading: false });
+        //     });
+
+
+        const queryParams = [];
+
+        for (let i in this.state.ingredients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+        }
+
+        queryParams.push(encodeURIComponent('price') + '=' + encodeURIComponent(this.state.price));
+
+        const queryString = queryParams.join('&');
+
+        this.props.history.push({
+            pathname:'/checkout',
+            search: '?' + queryString
+        });
     }
 
 
