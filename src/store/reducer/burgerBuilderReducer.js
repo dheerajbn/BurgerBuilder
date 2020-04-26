@@ -1,13 +1,10 @@
-import * as actionTypes from './actions';
+import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-    ingredients: {
-        cheese: 0,
-        salad: 0,
-        meat: 0,
-        bacon: 0,
-    },
+    ingredients: null,
     price: 14,
+    error: false,
+    building: false,
 }
 
 const INGREDIENT_PRICE = {
@@ -26,7 +23,8 @@ const reducer = (state = initialState, action) => {
                 ingredients: {
                     ...state.ingredients,
                     [action.payload.ingredientName]: state.ingredients[action.payload.ingredientName] + 1,
-                }
+                },
+                building: true,
             };
         case actionTypes.REMOVE_INGREDIENT:
             return {
@@ -35,11 +33,22 @@ const reducer = (state = initialState, action) => {
                 ingredients: {
                     ...state.ingredients,
                     [action.payload.ingredientName]: state.ingredients[action.payload.ingredientName] - 1,
-                }
+                },
+                building: true,
             };
-        case actionTypes.CLEAR_INGREDIENTS:
+        case actionTypes.INIT_INGREDIENTS:
             return {
                 ...initialState,
+                ingredients: action.payload.ingredients,
+                price: initialState.price,
+                error: false,
+                building: false,
+            };
+        case actionTypes.SET_ERROR:
+            return {
+                ...initialState,
+                error: true,
+                building: false,
             };
         default:
             return state;
