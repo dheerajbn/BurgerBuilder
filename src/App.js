@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
+import asyncComponent from './hoc/asyncComponent/asyncComponent';
 import Layout from './components/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
-import Checkout from './containers/Checkout/Checkout';
-import { Route, Switch } from 'react-router-dom';
-import Orders from './containers/Orders/Orders';
-import Login from './containers/Login/Login';
-import Logout from './containers/Logout/Logout';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { autoSignin } from './store/actions';
 import { connect } from 'react-redux';
+
+const asyncCheckout = asyncComponent(() => {
+  return import('./containers/Checkout/Checkout');
+})
+const asyncOrders = asyncComponent(() => {
+  return import('./containers/Orders/Orders');
+})
+const asyncLogin = asyncComponent(() => {
+  return import('./containers/Login/Login');
+})
+const asyncLogout = asyncComponent(() => {
+  return import('./containers/Logout/Logout');
+})
 
 class App extends Component {
 
@@ -16,19 +26,38 @@ class App extends Component {
   }
 
   render() {
+
+    let props = <Switch>
+      <Route path="/" exact component={BurgerBuilder} />
+      <Route path="/login" exact component={asyncLogin} />
+      <Redirect to="/" />
+    </Switch>
+
+    if (this.props.isAuth) {
+      props =
+        <Switch>
+          <Route path="/checkout" component={asyncCheckout} />
+          <Route path="/orders" exact component={asyncOrders} />
+          <Route path="/" exact component={BurgerBuilder} />
+          <Route path="/login" exact component={asyncLogin} />
+          <Route path="/logout" exact component={asyncLogout} />
+          <Redirect to="/" />
+        </Switch>
+    }
+
     return (
       <div >
         <Layout>
-          <Switch>
-            <Route path="/checkout" component={Checkout} />
-            <Route path="/orders" exact component={Orders} />
-            <Route path="/" exact component={BurgerBuilder} />
-            <Route path="/login" exact component={Login} />
-            <Route path="/logout" exact component={Logout} />
-          </Switch>
+          {props}
         </Layout>
       </div>
     );
+  }
+}
+
+const mapStateToProps = state => {
+  return {
+    isAuth: state.auth.authData != null,
   }
 }
 
@@ -38,4 +67,4 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

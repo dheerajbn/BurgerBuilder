@@ -16,7 +16,7 @@ const sideDrawer = (props) => {
     return (
         <Auxiliary>
             <Backdrop show={props.open} click={props.closed} />
-            <div className={attachClasses.join(' ')}>
+            <div className={attachClasses.join(' ')} onClick={props.closed}>
                 <div style={{ height: '11%', marginBottom: '32px' }}>
                     <Logo />
                 </div>
