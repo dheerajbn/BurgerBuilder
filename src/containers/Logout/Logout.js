@@ -1,28 +1,27 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useEffectOnce } from 'react-use';
 import { connect } from 'react-redux';
 import { logout } from '../../store/actions';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import { Redirect } from 'react-router';
 
-class Logout extends Component {
+const Logout = props => {
 
-    componentDidMount() {
-        this.props.onLogout();
+    useEffectOnce(() => {
+        props.onLogout();
+    });
+
+    let data = <Spinner />;
+
+    if (!props.authData) {
+        data = <Redirect to="/" />;
     }
 
-    render() {
-        let data = <Spinner />;
-
-        if (!this.props.authData) {
-            data = <Redirect to="/" />;
-        }
-
-        return (
-            <React.Fragment>
-                {data}
-            </React.Fragment>
-        );
-    }
+    return (
+        <React.Fragment>
+            {data}
+        </React.Fragment>
+    );
 }
 
 const mapStateToProps = state => {

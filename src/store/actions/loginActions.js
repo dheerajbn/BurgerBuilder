@@ -53,7 +53,7 @@ export const authenticateUser = (email, password, signUp) => {
             returnSecureToken: true,
         }
 
-        let url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=[YOUR API KEY]";
+        let url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={YOUR API KEY}";
 
         if (!signUp) {
             url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={YOUR API KEY}"

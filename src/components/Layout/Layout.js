@@ -1,34 +1,29 @@
-import React, { Component } from 'react';
-import Auxiliary from '../../hoc/Auxiliary';
+import React, { useState, useCallback } from 'react';
 import classes from './Layout.module.css';
 import Toolbar from '../Navigation/Toolbar/Toolbar';
 import SideDrawer from '../Navigation/SideDrawer/SideDrawer';
 
-class Layout extends Component {
+const Layout = props => {
 
-    state = {
-        showSideDrawer: false,
-    }
+    const [showSideDrawer, setShowSideDrawer] = useState(false);
 
-    sideDrawerClosedHandler = () => {
-        this.setState({ showSideDrawer: false });
-    }
+    const sideDrawerClosedHandler = useCallback(() => {
+        setShowSideDrawer(false);
+    }, []);
 
-    sideDrawerOpenHandler = () => {
-        this.setState((prevState) => { return { showSideDrawer: !prevState.showSideDrawer } });
-    }
+    const sideDrawerOpenHandler = useCallback(() => {
+        setShowSideDrawer(prevState => !prevState);
+    }, []);
 
-    render() {
-        return (
-            <Auxiliary>
-                <Toolbar open={this.sideDrawerOpenHandler} />
-                <SideDrawer open={this.state.showSideDrawer} closed={this.sideDrawerClosedHandler} />
-                <main className={classes.Content}>
-                    {this.props.children}
-                </main>
-            </Auxiliary>
-        );
-    }
+    return (
+        <React.Fragment>
+            <Toolbar open={sideDrawerOpenHandler} />
+            <SideDrawer open={showSideDrawer} closed={sideDrawerClosedHandler} />
+            <main className={classes.Content}>
+                {props.children}
+            </main>
+        </React.Fragment>
+    );
 }
 
 export default Layout;

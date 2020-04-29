@@ -1,42 +1,36 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
+import { useUnmount } from 'react-use';
 import Modal from '../../components/UI/Modal/Modal';
-import Auxiliary from '../Auxiliary';
 
 const withErrorHandler = (WrappedComponent, axios) => {
-    return class extends Component {
+    return props => {
+        const [error, setError] = useState(null);
 
-        state = {
-            error: null,
-        }
+        const reqInterceptor = axios.interceptors.request.use(req => {
+            setError(null);
+            return req;
+        });
+        const resInterceptor = axios.interceptors.response.use(res => res, err => {
+            setError(err);
+        });
 
-        componentDidMount() {
-            this.requestInterceptor =  axios.interceptors.request.use(req => {
-                this.setState({ error: null });
-                return req;
-            })
+        useUnmount(() => {
+            // return () => {
+            axios.interceptors.request.eject(reqInterceptor);
+            axios.interceptors.response.eject(resInterceptor);
+            // };
+        });
 
-            this.responseInterceptor = axios.interceptors.response.use(res => res, error => {
-                this.setState({ error: error });
-            });
-        }
+        const clearErrorHandler = () => {
+            setError(null);
+        };
 
-        componentWillUnmount () {
-            axios.interceptors.request.eject(this.requestInterceptor);
-            axios.interceptors.response.eject(this.responseInterceptor);
-        }
-
-        clearErrorHandler = () => {
-            this.setState({ error: null });
-        }
-
-        render() {
-            return (
-                <Auxiliary >
-                    <Modal show={this.state.error} click={this.clearErrorHandler}>{this.state.error ? this.state.error.message : null}</Modal>
-                    <WrappedComponent {...this.props} />
-                </Auxiliary>
-            );
-        }
+        return (
+            <React.Fragment >
+                <Modal show={error} click={clearErrorHandler}>{error && error.message}</Modal>
+                <WrappedComponent {...props} />
+            </React.Fragment>
+        );
     }
 };
 

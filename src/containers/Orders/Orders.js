@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import React from "react";
+import { useEffectOnce } from 'react-use';
 import Order from "../../components/Order/Order";
 import axios from '../../axiosInstances';
 import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
@@ -6,33 +7,34 @@ import { fetchOrders } from "../../store/actions";
 import { connect } from "react-redux";
 import Spinner from "../../components/UI/Spinner/Spinner";
 
-class Orders extends Component {
+const Orders = props => {
 
-    componentDidMount() {
+    const { authData, onFetchOrders } = props;
+
+    useEffectOnce(() => {
         let authId = null;
         let userId = null;
-        if (this.props.authData) {
-            authId = this.props.authData.idToken;
-            userId = this.props.authData.localId;
+        if (authData) {
+            authId = authData.idToken;
+            userId = authData.localId;
         }
-        this.props.onFetchOrders(authId, userId);
+        onFetchOrders(authId, userId);
+
+    });
+
+    let data = <Spinner />
+    if (!props.loading) {
+        if (props.error) {
+            data = <p>Couldn't retrieve orders.</p>
+        } else {
+            data =
+                <div>
+                    {props.orders.map(order => <Order key={order.id} ingredients={order.ingredients} price={+order.price} />)}
+                </div>
+        }
     }
 
-    render() {
-        let data = <Spinner />
-        if (!this.props.loading) {
-            if (this.props.error) {
-                data = <p>Couldn't retrieve orders.</p>
-            } else {
-                data =
-                    <div>
-                        {this.props.orders.map(order => <Order key={order.id} ingredients={order.ingredients} price={+order.price} />)}
-                    </div>
-            }
-        }
-
-        return data;
-    }
+    return data;
 }
 
 const mapStateToProps = state => {
